@@ -20,7 +20,6 @@
     for trying different fonts use (.mms <text>_1)(u can use 1 to 10).
 
 """
-
 import asyncio
 import os
 import textwrap
@@ -69,9 +68,19 @@ async def ultd(event):
     )
     await xx.delete()
     try:
-        os.remove(ultt)
         os.remove(file)
+    except BaseException:
+        pass
+    try:
+        os.remove("ultt.webp")
+    except BaseException:
+        pass
+    try:
         os.remove(stick)
+    except BaseException:
+        pass
+    try:
+        os.remove(ultt)
     except BaseException:
         pass
 
@@ -97,45 +106,62 @@ async def draw_meme_text(image_path, msg):
     current_h, pad = 10, 5
     if upper_text:
         for u_text in textwrap.wrap(upper_text, width=15):
-            u_width, u_height = draw.textsize(u_text, font=m_font)
+            bbox = draw.textbbox((0, 0), u_text, font=m_font)
+            width = bbox[2] - bbox[0]
             draw.text(
-                xy=(((i_width - u_width) / 2) - 1, int((current_h / 640) * i_width)),
+                xy=(
+                    ((i_width - width) / 2) - 1,
+                    int((current_h / 640) * i_width) + bbox[1],
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=(((i_width - u_width) / 2) + 1, int((current_h / 640) * i_width)),
+                xy=(
+                    ((i_width - width) / 2) + 1,
+                    int((current_h / 640) * i_width) + bbox[1],
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=((i_width - u_width) / 2, int(((current_h / 640) * i_width)) - 1),
+                xy=(
+                    (i_width - width) / 2,
+                    int(((current_h / 640) * i_width)) + bbox[1] - 1,
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=(((i_width - u_width) / 2), int(((current_h / 640) * i_width)) + 1),
+                xy=(
+                    (i_width - width) / 2,
+                    int(((current_h / 640) * i_width)) + bbox[1] + 1,
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=((i_width - u_width) / 2, int((current_h / 640) * i_width)),
+                xy=(
+                    (i_width - width) / 2,
+                    int((current_h / 640) * i_width) + bbox[1],
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(255, 255, 255),
             )
-            current_h += u_height + pad
+            current_h += bbox[3] - bbox[1] + pad
     if lower_text:
         for l_text in textwrap.wrap(lower_text, width=15):
-            u_width, u_height = draw.textsize(l_text, font=m_font)
+            bbox = draw.textbbox((0, 0), l_text, font=m_font)
+            width = bbox[2] - bbox[0]
             draw.text(
                 xy=(
-                    ((i_width - u_width) / 2) - 1,
-                    i_height - u_height - int((80 / 640) * i_width),
+                    ((i_width - width) / 2) - 1,
+                    i_height - int((80 / 640) * i_width) + bbox[1],
                 ),
                 text=l_text,
                 font=m_font,
@@ -143,8 +169,8 @@ async def draw_meme_text(image_path, msg):
             )
             draw.text(
                 xy=(
-                    ((i_width - u_width) / 2) + 1,
-                    i_height - u_height - int((80 / 640) * i_width),
+                    ((i_width - width) / 2) + 1,
+                    i_height - int((80 / 640) * i_width) + bbox[1],
                 ),
                 text=l_text,
                 font=m_font,
@@ -152,8 +178,8 @@ async def draw_meme_text(image_path, msg):
             )
             draw.text(
                 xy=(
-                    (i_width - u_width) / 2,
-                    (i_height - u_height - int((80 / 640) * i_width)) - 1,
+                    (i_width - width) / 2,
+                    (i_height - int((80 / 640) * i_width)) + bbox[1] - 1,
                 ),
                 text=l_text,
                 font=m_font,
@@ -161,8 +187,8 @@ async def draw_meme_text(image_path, msg):
             )
             draw.text(
                 xy=(
-                    (i_width - u_width) / 2,
-                    (i_height - u_height - int((80 / 640) * i_width)) + 1,
+                    (i_width - width) / 2,
+                    (i_height - int((80 / 640) * i_width)) + bbox[1] + 1,
                 ),
                 text=l_text,
                 font=m_font,
@@ -170,14 +196,14 @@ async def draw_meme_text(image_path, msg):
             )
             draw.text(
                 xy=(
-                    (i_width - u_width) / 2,
-                    i_height - u_height - int((80 / 640) * i_width),
+                    (i_width - width) / 2,
+                    i_height - int((80 / 640) * i_width) + bbox[1],
                 ),
                 text=l_text,
                 font=m_font,
                 fill=(255, 255, 255),
             )
-            current_h += u_height + pad
+            current_h += bbox[3] - bbox[1] + pad
     imag = "ultt.webp"
     img.save(imag, "WebP")
     return imag
@@ -249,45 +275,62 @@ async def draw_meme(image_path, msg):
     current_h, pad = 10, 5
     if upper_text:
         for u_text in textwrap.wrap(upper_text, width=15):
-            u_width, u_height = draw.textsize(u_text, font=m_font)
+            bbox = draw.textbbox((0, 0), u_text, font=m_font)
+            width = bbox[2] - bbox[0]
             draw.text(
-                xy=(((i_width - u_width) / 2) - 1, int((current_h / 640) * i_width)),
+                xy=(
+                    ((i_width - width) / 2) - 1,
+                    int((current_h / 640) * i_width) + bbox[1],
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=(((i_width - u_width) / 2) + 1, int((current_h / 640) * i_width)),
+                xy=(
+                    ((i_width - width) / 2) + 1,
+                    int((current_h / 640) * i_width) + bbox[1],
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=((i_width - u_width) / 2, int(((current_h / 640) * i_width)) - 1),
+                xy=(
+                    (i_width - width) / 2,
+                    int(((current_h / 640) * i_width)) + bbox[1] - 1,
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=(((i_width - u_width) / 2), int(((current_h / 640) * i_width)) + 1),
+                xy=(
+                    (i_width - width) / 2,
+                    int(((current_h / 640) * i_width)) + bbox[1] + 1,
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(0, 0, 0),
             )
             draw.text(
-                xy=((i_width - u_width) / 2, int((current_h / 640) * i_width)),
+                xy=(
+                    (i_width - width) / 2,
+                    int((current_h / 640) * i_width) + bbox[1],
+                ),
                 text=u_text,
                 font=m_font,
                 fill=(255, 255, 255),
             )
-            current_h += u_height + pad
+            current_h += bbox[3] - bbox[1] + pad
     if lower_text:
         for l_text in textwrap.wrap(lower_text, width=15):
-            u_width, u_height = draw.textsize(l_text, font=m_font)
+            bbox = draw.textbbox((0, 0), l_text, font=m_font)
+            width = bbox[2] - bbox[0]
             draw.text(
                 xy=(
-                    ((i_width - u_width) / 2) - 1,
-                    i_height - u_height - int((20 / 640) * i_width),
+                    ((i_width - width) / 2) - 1,
+                    i_height - int((20 / 640) * i_width) + bbox[1],
                 ),
                 text=l_text,
                 font=m_font,
@@ -295,8 +338,8 @@ async def draw_meme(image_path, msg):
             )
             draw.text(
                 xy=(
-                    ((i_width - u_width) / 2) + 1,
-                    i_height - u_height - int((20 / 640) * i_width),
+                    ((i_width - width) / 2) + 1,
+                    i_height - int((20 / 640) * i_width) + bbox[1],
                 ),
                 text=l_text,
                 font=m_font,
@@ -304,8 +347,8 @@ async def draw_meme(image_path, msg):
             )
             draw.text(
                 xy=(
-                    (i_width - u_width) / 2,
-                    (i_height - u_height - int((20 / 640) * i_width)) - 1,
+                    (i_width - width) / 2,
+                    (i_height - int((20 / 640) * i_width)) + bbox[1] - 1,
                 ),
                 text=l_text,
                 font=m_font,
@@ -313,8 +356,8 @@ async def draw_meme(image_path, msg):
             )
             draw.text(
                 xy=(
-                    (i_width - u_width) / 2,
-                    (i_height - u_height - int((20 / 640) * i_width)) + 1,
+                    (i_width - width) / 2,
+                    (i_height - int((20 / 640) * i_width)) + bbox[1] + 1,
                 ),
                 text=l_text,
                 font=m_font,
@@ -322,14 +365,14 @@ async def draw_meme(image_path, msg):
             )
             draw.text(
                 xy=(
-                    (i_width - u_width) / 2,
-                    i_height - u_height - int((20 / 640) * i_width),
+                    (i_width - width) / 2,
+                    i_height - int((20 / 640) * i_width) + bbox[1],
                 ),
                 text=l_text,
                 font=m_font,
                 fill=(255, 255, 255),
             )
-            current_h += u_height + pad
+            current_h += bbox[3] - bbox[1] + pad
     pics = "ultt.png"
     img.save(pics, "png")
     return pics
