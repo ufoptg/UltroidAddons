@@ -1,60 +1,125 @@
-# Ported Plugin
-
+# Ultroid - UserBot
+# Copyright (C) 2023-2024 @TeamUltroid
+#
+# This file is a part of < https://github.com/ufoptg/UltroidBackup/ >
+# PLease read the GNU Affero General Public License in
+# <https://www.github.com/ufoptg/UltroidBackup/blob/main/LICENSE/>.
+# By @TrueSaiyan
 """
-✘ Commands Available -
+❍ Commands Available -
 
-• `{i}waifu <text>`
-    paste text on random stickers.
+• `{i}waifu` or {i}waifu <type>
+    Send sfw waifu or select.
+
+• `{i}waifu2` or {i}waifu2 <type>
+    Send a nsfw waifu.
+
+~ NSFW: `waifu` `neko` `trap` `blowjob`
+
+~ SFW: `waifu` `neko` `shinobu` `megumin`
+     `bully` `cuddle` `cry` `hug` `awoo`
+     `kiss` `lick` `pat` `smug` `bonk`
+     `blush` `smile` `wave` `highfive`
+     `nom` `bite` `glomp` `slap` `kill`
+     `kick` `happy` `wink` `poke` `dance`
+     `cringe` `handhold` `yeet`
 """
 
-import re
-import random  # Import random module
+import asyncio
+import random
 
-from . import *  # Ensure this imports necessary components
+import requests
+from telethon.errors.rpcerrorlist import MessageIdInvalidError
 
-EMOJI_PATTERN = re.compile(
-    "["
-    "\U0001F1E0-\U0001F1FF"  # flags (iOS)
-    "\U0001F300-\U0001F5FF"  # symbols & pictographs
-    "\U0001F600-\U0001F64F"  # emoticons
-    "\U0001F680-\U0001F6FF"  # transport & map symbols
-    "\U0001F700-\U0001F77F"  # alchemical symbols
-    "\U0001F780-\U0001F7FF"  # Geometric Shapes Extended
-    "\U0001F800-\U0001F8FF"  # Supplemental Arrows-C
-    "\U0001F900-\U0001F9FF"  # Supplemental Symbols and Pictographs
-    "\U0001FA00-\U0001FA6F"  # Chess Symbols
-    "\U0001FA70-\U0001FAFF"  # Symbols and Pictographs Extended-A
-    "\U00002702-\U000027B0"  # Dingbats
-    "]+",
-)
+from . import ultroid_bot, ultroid_cmd
 
-def deEmojify(inputString: str) -> str:
-    """Remove emojis and other non-safe characters from string"""
-    return re.sub(EMOJI_PATTERN, "", inputString)
+class WaifuApiUrl:
+    def __init__(
+        self,
+        url: str = "api.waifu.pics",
+        method: str = None,
+        parameter: str = None,
+        allow_web: str = "https",
+    ):
+        self.url = url
+        self.method = method
+        self.parameter = parameter
+        self.allow_web = allow_web
+
+    def checking(self):
+        api_url = f"{self.allow_web}://{self.url}/{self.method}/{self.parameter}"
+        return api_url
 
 @ultroid_cmd(
-    pattern="waifu ?(.*)",
+    pattern=r"waifu(|2)(?:\s|$)([\s\S]*)",
 )
-async def waifu(animu):
-    xx = await eor(animu, get_string("com_1"))
-    text = animu.pattern_match.group(1)
-    if not text:
-        if animu.is_reply:
-            text = (await animu.get_reply_message()).message
+async def _(event):
+    raw_text = event.raw_text.split(" ", 1)
+    try:
+        load = await event.eor("Getting Data")
+    except MessageIdInvalidError:
+        pass
+    cat = None
+
+    # Create an instance of the PrivateApiUrl class
+    private_api = WaifuApiUrl()
+
+    # Set the method and parameter based on the command
+    if event.pattern_match.group(1) == "2":
+        private_api.method = "nsfw"
+        if len(raw_text) < 2:
+            cat = ["waifu", "neko", "trap", "blowjob"]
         else:
-            await xx.edit(get_string("sts_1"))
-            return
-    
-    waifus = [32, 33, 37, 40, 41, 42, 58, 20]
-    finalcall = "#" + str(random.choice(waifus))
-    stickers = await animu.client.inline_query(
-        "stickerizerbot",
-        f"{finalcall}{deEmojify(text)}",
+            cat = raw_text[1].split()
+    elif cat is None:
+        private_api.method = "sfw"
+        if len(raw_text) < 2:
+            cat = [
+                "waifu",
+                "neko",
+                "shinobu",
+                "megumin",
+                "bully",
+                "cuddle",
+                "cry",
+                "hug",
+                "awoo",
+                "kiss",
+                "lick",
+                "pat",
+                "smug",
+                "bonk",
+                "yeet",
+                "blush",
+                "smile",
+                "wave",
+                "highfive",
+                "handhold",
+                "nom",
+                "bite",
+                "glomp",
+                "slap",
+                "kill",
+                "kick",
+                "happy",
+                "wink",
+                "poke",
+                "dance",
+                "cringe",
+            ]
+        else:
+            cat = raw_text[1].split()
+
+    cat_phrase = random.choice(cat)
+    private_api.parameter = cat_phrase
+    api_url = private_api.checking()
+
+    response = requests.get(api_url)
+
+    image_url = response.json()["url"]
+
+    await asyncio.sleep(1)
+    await load.delete()
+    await event.client.send_file(
+        event.chat_id, image_url, reply_to=event.reply_to_msg_id
     )
-    await stickers[0].click(
-        animu.chat_id,
-        reply_to=animu.reply_to_msg_id,
-        silent=bool(animu.is_reply),
-        hide_via=True,
-    )
-    await xx.delete()
