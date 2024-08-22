@@ -1,4 +1,4 @@
-https://github.com/ufoptg/covid.git
+git+https://github.com/ufoptg/covid.git
 emoji
 fonttools
 gtts
