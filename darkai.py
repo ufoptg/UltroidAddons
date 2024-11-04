@@ -18,8 +18,6 @@ from collections import deque
 from . import ultroid_cmd, LOGS, run_async
 import base64
 
-p(atc)
-
 darkai_chat_history_SIZE = 80
 
 darkai_chat_history = deque(maxlen=darkai_chat_history_SIZE)
