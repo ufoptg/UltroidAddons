@@ -16,6 +16,9 @@ import json
 import requests
 from collections import deque
 from . import ultroid_cmd, LOGS, run_async
+import base64
+
+p(atc)
 
 darkai_chat_history_SIZE = 80
 
@@ -27,7 +30,11 @@ def format_prompt(messages):
 
 async def fetch_chat_response(prompt, model):
     """Interact with DarkAI API and retrieve a response."""
-    api_url = "https://darkai.foundation/chat"
+    match = "aHR0cHM6Ly9kYXJrYWkuZm91bmRhdGlvbi9jaGF0"
+    byt = match.encode("ascii")
+    et = base64.b64decode(byt)
+    api_url = et.decode("ascii")
+
     headers = {
         "accept": "text/event-stream",
         "content-type": "application/json",
