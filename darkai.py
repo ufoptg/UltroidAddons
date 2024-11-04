@@ -4,6 +4,13 @@
 # This file is a part of < https://github.com/ufoptg/UltroidAddons/ >
 # PLease read the GNU Affero General Public License in
 # <https://www.github.com/ufoptg/Nimbus/blob/main/LICENSE/>.
+"""
+**Get Answers from DarkAI(GPT-4o) a Uncensored Psychiatrist**
+
+• `{i}darkai` Talk to a Psychiatrist
+    ~ • `{i}darkai hello`
+• `{i}darkai -c` Clear Chat History
+"""
 
 import json
 import requests
@@ -62,7 +69,7 @@ async def darkai_chat(e):
 
     if user_input == "-c":
         darkai_chat_history.clear()
-        return await event.eor("Cleared DᴀʀᴋAI Chat History!", time=6)
+        return await e.eor("Cleared DᴀʀᴋAI Chat History!", time=6)
 
     darkai_chat_history.append({"role": "user", "content": user_input})
     prompt = format_prompt(darkai_chat_history)
