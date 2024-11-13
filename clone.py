@@ -1,9 +1,9 @@
 # Ported From DarkCobra , Originally By Uniborg
-# Nimbus ~ UserBot
+# Ultroid ~ UserBot
 #
-# This file is a part of < https://github.com/ufoptg/Nimbus/ >
+# This file is a part of < https://github.com/ufoptg/UltroidBackup/ >
 # PLease read the GNU Affero General Public License in
-# <https://www.github.com/ufoptg/Nimbus/blob/main/LICENSE/>.
+# <https://www.github.com/ufoptg/UltroidBackup/blob/main/LICENSE/>.
 
 """
 ❍ Commands Available
@@ -20,6 +20,7 @@ import os
 
 from telethon.tl.functions.account import UpdateProfileRequest
 from telethon.tl.functions.photos import DeletePhotosRequest, UploadProfilePhotoRequest
+from telethon.errors.rpcerrorlist import AboutTooLongError
 from telethon.tl.functions.users import GetFullUserRequest
 from telethon.tl.types import MessageEntityMentionName
 
@@ -53,13 +54,20 @@ async def clone_identity(event):
     last_name = html.escape(replied_user.users[0].last_name or "⁪⁬⁮⁮⁮")
     user_bio = replied_user.full_user.about or ""
 
-    await event.client(UpdateProfileRequest(first_name=first_name, last_name=last_name, about=user_bio))
+    if len(user_bio) > 70:
+        user_bio = user_bio[:67] + "..."
+
+    try:
+        await event.client(UpdateProfileRequest(first_name=first_name, last_name=last_name, about=user_bio))
+    except AboutTooLongError:
+        await eve.edit("Failed to update bio, even after shortening.")
+        return
+
     if profile_pic:
         pfile = await event.client.upload_file(profile_pic)
         await event.client(UploadProfilePhotoRequest(file=pfile))
         os.remove(profile_pic)
 
-    
     cloned_photo = await event.client.get_profile_photos("me", limit=1)
     if cloned_photo:
         udB.set_key(f"{ultroid_bot.uid}_cloned_photo", cloned_photo[0])
