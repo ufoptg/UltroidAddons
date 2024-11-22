@@ -27,7 +27,7 @@ from . import *
 if udB.get_key("MONg"):
     lastSeendB = udB.get_key("MONg")
 else:
-	lastSeendB = "mongodb+srv://NimbusStat:eF91wysaj6sIEiA8@cluster0.iil65vg.mongodb.net/"
+	lastSeendB = "mongodb+srv://LastSeenUlt:YKzBfhfjtObPfQLD@cluster0.iil65vg.mongodb.net/"
 
 # MongoDB client setup
 mongo_client = motor.motor_asyncio.AsyncIOMotorClient(lastSeendB)
