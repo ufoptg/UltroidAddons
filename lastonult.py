@@ -27,16 +27,21 @@ from . import *
 if udB.get_key("MONg"):
     lastSeendB = udB.get_key("MONg")
 else:
-	lastSeendB = "mongodb+srv://LastSeenUlt:YKzBfhfjtObPfQLD@cluster0.iil65vg.mongodb.net/"
+    lastSeendB = "mongodb+srv://LastSeenUlt:YKzBfhfjtObPfQLD@cluster0.iil65vg.mongodb.net/"
 
 # MongoDB client setup
 mongo_client = motor.motor_asyncio.AsyncIOMotorClient(lastSeendB)
 db = mongo_client["User_Status"]
 collection = db["user_data"]
 
-# Define the UTC timezone and Perth timezone
+# Define the UTC timezone and Local timezone
+if udB.get_key("TIMEZONE"):
+    localTZ = udB.get_key("TIMEZONE")
+else:
+    localTZ = "Asia/Kolkata"
+
 utc_tz = pytz.utc
-perth_tz = pytz.timezone("Asia/Kolkata")
+perth_tz = pytz.timezone(localTZ)
 
 
 async def mention_user(user_id):
